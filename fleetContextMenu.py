@@ -1,9 +1,12 @@
-import os
+from pathlib import Path
+from os import getenv
 import sys
 import winreg
 import ctypes
 import time
+import shutil
 
+print(getenv('USERPROFILE') or getenv('HOME'))
 def is_admin():
     try:
         return ctypes.windll.shell32.IsUserAnAdmin()
@@ -15,15 +18,22 @@ def run_as_admin():
         None, "runas", sys.executable, " ".join(sys.argv), None, 1
     )
 
+
+user = getenv('USERPROFILE') or getenv('HOME')
+relative_themes = Path(__file__).parent / "themes"
+fleet_folder = user / ".fleet" / "themes"
+shutil.copy2(relative_themes, fleet_folder)
+
 # Define paths and menu text
 menu_text = "Open with Fleet"
-appdata_local_path = os.path.join(os.getenv('LOCALAPPDATA'), 'Programs')
+appdata_local_path = getenv('LOCALAPPDATA') / 'Programs' 
+
 
 # Specify the rest of the path to your executable
 executable_path = 'Fleet\Fleet.exe'
 
 # Combine the paths
-app_path = os.path.join(appdata_local_path, executable_path)
+app_path = appdata_local_path / executable_path
 
 def add_context_menu(location):
     """Adds a new context menu entry for folders."""
