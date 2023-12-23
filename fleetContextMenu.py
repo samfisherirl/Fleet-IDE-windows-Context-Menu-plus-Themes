@@ -6,22 +6,6 @@ import ctypes
 import time
 import shutil
 
-def is_admin():
-    try:
-        return ctypes.windll.shell32.IsUserAnAdmin()
-    except:
-        return False
-
-def run_as_admin():
-    ctypes.windll.shell32.ShellExecuteW(
-        None, "runas", sys.executable, " ".join(sys.argv), None, 1
-    )
-
-
-user = getenv('USERPROFILE') or getenv('HOME')
-relative_themes = Path(__file__).parent / "themes"
-fleet_folder = user / ".fleet" / "themes"
-shutil.copy2(relative_themes, fleet_folder)
 
 # Define paths and menu text
 menu_text = "Open with Fleet"
@@ -34,6 +18,23 @@ executable_path = 'Fleet\Fleet.exe'
 # Combine the paths
 app_path = appdata_local_path / executable_path
 
+
+def is_admin():
+    try:
+        return ctypes.windll.shell32.IsUserAnAdmin()
+    except:
+        return False
+
+def copy_themes():
+    user = getenv('USERPROFILE') or getenv('HOME')
+    relative_themes = Path(__file__).parent / "themes"
+    fleet_folder = user / ".fleet" / "themes"
+    shutil.copy2(relative_themes, fleet_folder)
+
+def run_as_admin():
+    ctypes.windll.shell32.ShellExecuteW(
+        None, "runas", sys.executable, " ".join(sys.argv), None, 1
+    )
 def add_context_menu(location):
     """Adds a new context menu entry for folders."""
 
@@ -69,13 +70,16 @@ if not is_admin():
     run_as_admin()
     sys.exit()
 
-# Remove existing entries
-remove_context_menu("Background\\shell")
-remove_context_menu("shell")
+if __name__ == "__main__":
+    copy_themes()
 
-# Add new context menu entry
-add_context_menu("Background\\shell")
-add_context_menu("shell")
+    # Remove existing entries
+    remove_context_menu("Background\\shell")
+    remove_context_menu("shell")
 
-print(f"Successfully added '{menu_text}' context menu entry for folders.")
-time.sleep(3)
+    # Add new context menu entry
+    add_context_menu("Background\\shell")
+    add_context_menu("shell")
+
+    print(f"Successfully added '{menu_text}' context menu entry for folders.")
+    time.sleep(3)
