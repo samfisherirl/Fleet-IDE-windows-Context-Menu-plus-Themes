@@ -6,7 +6,6 @@ import ctypes
 import time
 import shutil
 
-print(getenv('USERPROFILE') or getenv('HOME'))
 def is_admin():
     try:
         return ctypes.windll.shell32.IsUserAnAdmin()
